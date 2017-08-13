@@ -8,7 +8,9 @@
 ### 更新日志
 
 2017 August 12th 第一版的豆瓣爬虫完成，但是被封了IP，只好过几天在试试。
+
 2017 August 13th 第二版豆瓣爬虫完成，总结：
+
 趁着暑假的空闲，把在上个学期学到的Python数据采集的皮毛用来试试手，写了一个爬取豆瓣图书的爬虫，总结如下：
 下面是我要做的事：
 1. 登录
@@ -61,7 +63,7 @@ https://book.douban.com/subject/[书的编号]/
 ![HttpFox抓到的记录](http://img.blog.csdn.net/20170813133015231?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 - 查看内容
-![这里写图片描述](http://img.blog.csdn.net/20170813133412421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![HTTPFOX](http://img.blog.csdn.net/20170813133412421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 这样就获得了cookies和headers，把他们复制下来，直接复制到程序里或者用文件存储，用你喜欢的方式保存下来。
 login函数
 ```py
@@ -106,9 +108,9 @@ with open("channel.txt","w") as file:
 ```
 上面代码当中用了CSS选择器，不懂CSS没关系，将相应的网站页面用浏览器打开，打开开发者工具，在elements界面右键要爬取的内容，copy->selector
 (我用的是chrome浏览器，在正常的图形网页里右键检查就能直接定位到对应的elements位置），将CSS选择器复制下来，注意如果出现了`:nth-child(*)`之类的都要去掉，不然会报错。
-![这里写图片描述](http://img.blog.csdn.net/20170813141504937?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![CSS1](https://github.com/thronewang/Scraping/blob/master/CSS1.PNG?raw=true)
 然后我们得到了链接的目录：
-![links](http://img.blog.csdn.net/20170813140436074?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![links](https://github.com/thronewang/Scraping/blob/master/links.PNG?raw=true)
 
 #### 第四步
 下面先找一找爬取的方法
