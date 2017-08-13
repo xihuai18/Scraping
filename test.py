@@ -38,11 +38,24 @@ def get_brief(line_tags):
 def get_author(raw_author):
     parts = raw_author.split('\n')
     return ''.join(map(str.strip,parts))
-    
-with open('C:/Users/lenovo/OneDrive/projects/Scraping/testhtml.html', encoding='utf-8') as file:
-    html = file.read()
 
-soup = BeautifulSoup(html,'lxml')
+
+def login(url):
+        cookies = {}
+        with open("C:/Users/lenovo/OneDrive/projects/Scraping/doubancookies.txt") as file:
+            raw_cookies = file.read();
+            for line in raw_cookies.split(';'):
+                key,value = line.split('=',1)
+                cookies[key] = value
+        headers = {'User-Agent':'''Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.78 Safari/537.36'''}
+        s = requests.get(url, cookies=cookies, headers=headers)
+        return s 
+    
+with open('C:/Users/lenovo/OneDrive/projects/Scraping/channel.txt') as file:
+    urls = file.readlines()
+
+
+html = login(urls[1].strip()).text
 
 #for book in books:
 bookSoup = BeautifulSoup(html,'lxml')
@@ -77,7 +90,7 @@ except IndexError:
         scor = bookSoup.select("#interest_sectl > div > div.rating_self.clearfix > strong")[0].contents[0]
         coverUrl = bookSoup.select("#mainpic > a > img")[0].attrs['src'];
         brief = get_brief(bookSoup.select('#link-report > div > div > p'))
-        print(title, publish, translator, author, Ptime, price, person, scor,WISBN)
+        print(title, publish, translator, author, Ptime, price, person, scor,ISBN)
         print(brief)
     except:
         pass
