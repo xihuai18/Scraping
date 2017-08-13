@@ -15,7 +15,7 @@ from urllib.request import urlretrieve     #下载图片
 import re             #处理诡异的书名
 
 
-connection = pymysql.connect(host='localhost',user='root',password='midnGl8a3nd',charset='utf8')
+connection = pymysql.connect(host='localhost',user='root',password='',charset='utf8')
 with connection.cursor() as cursor:
     sql = "USE DOUBAN_DB;"
     cursor.execute(sql)
