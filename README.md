@@ -43,9 +43,7 @@ Sitemap: https://www.douban.com/sitemap_updated_index.xml
 User-agent: Wandoujia Spider
 Disallow: /
 ```
-
 再看看我要爬取的网站：
-
 ```html
 https://book.douban.com/tag/?view=type&icn=index-sorttags-all
 
@@ -55,7 +53,6 @@ https://book.douban.com/tag/[此处是标签名]
 
 https://book.douban.com/subject/[书的编号]/
 ```
-
 好了，并没有违反robots协议，安心的写代码了。
 
 #### 第二步
@@ -65,14 +62,10 @@ https://book.douban.com/subject/[书的编号]/
 - 找到这条记录
 ![HttpFox抓到的记录](http://img.blog.csdn.net/20170813133015231?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
-
 - 查看内容
-![HTTPFOX](http://img.blog.csdn.net/20170813133412421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
-
+![这里写图片描述](http://img.blog.csdn.net/20170813133412421?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 这样就获得了cookies和headers，把他们复制下来，直接复制到程序里或者用文件存储，用你喜欢的方式保存下来。
-
 login函数
-
 ```py
 def login(url):
         cookies = {}
@@ -85,16 +78,12 @@ def login(url):
         s = requests.get(url, cookies=cookies, headers=headers)
         return s  
 ```
-
 我在这里采用的是将headers复制到程序里，将cookies放入文件中读取的方式，同时注意要将cookies处理成字典的形式，然后用requests库的get函数获得网页响应。
 
 #### 第三步
-
 先进入豆瓣读书的分类目录
 <https://book.douban.com/tag/?view=type&icn=index-sorttags-all>
-
 我们把这个网站上的分类链接爬取下来：
-
 ```py
 import requests
 from bs4 import BeautifulSoup
@@ -117,20 +106,15 @@ with open("channel.txt","w") as file:
               file.write(link+'\n')
 
 ```
-
 上面代码当中用了CSS选择器，不懂CSS没关系，将相应的网站页面用浏览器打开，打开开发者工具，在elements界面右键要爬取的内容，copy->selector
 (我用的是chrome浏览器，在正常的图形网页里右键检查就能直接定位到对应的elements位置），将CSS选择器复制下来，注意如果出现了`:nth-child(*)`之类的都要去掉，不然会报错。
-
-![CSS1](https://github.com/thronewang/Scraping/blob/master/CSS1.PNG?raw=true)
-
+![这里写图片描述](http://img.blog.csdn.net/20170813141504937?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 然后我们得到了链接的目录：
-
-![links](https://github.com/thronewang/Scraping/blob/master/links.PNG?raw=true)
+![links](http://img.blog.csdn.net/20170813140436074?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 #### 第四步
 下面先找一找爬取的方法
 根据上面说的CSS选择器的方法，可以得到书名，作者，译者，评价人数，评分，还有这本书的封面链接和简介。
-
 ```py3
 title = bookSoup.select('#wrapper > h1 > span')[0].contents[0]
 title = deal_title(title)
@@ -141,33 +125,27 @@ scor = bookSoup.select("#interest_sectl > div > div.rating_self.clearfix > stron
 coverUrl = bookSoup.select("#mainpic > a > img")[0].attrs['src'];
 brief = get_brief(bookSoup.select('#link-report > div > div > p'))
 ```
-
 有几点要注意：
 
 - 文件名不能含有 `:?<>"|\/*` 所以用正则表达式处理一下：
-
 ```py
 def deal_title(raw_title):
     r = re.compile('[/\*?"<>|:]')
     return r.sub('~',raw_title)
 ```
-
 然后将封面下载下来：
-
 ```py3
 path = "C:/Users/lenovo/OneDrive/projects/Scraping/covers/"+title+".png"
 urlretrieve(coverUrl,path);
 ```
 
 - 作者名字爬取下来格式要处理过，否者会很难看
-
 ```py
 def get_author(raw_author):
     parts = raw_author.split('\n')
     return ''.join(map(str.strip,parts))
 ```
 - 图书简介也要处理一下
-
 ```py3
 def get_brief(line_tags):
     brief = line_tags[0].contents
@@ -178,7 +156,6 @@ def get_brief(line_tags):
 ```
 
 而对于出版社，出版时间，ISBN和图书定价，则可以用下面更简洁的方法获得：
-
 ```py3
 info = bookSoup.select('#info')
 infos = list(info[0].strings)
@@ -190,7 +167,6 @@ price = infos[infos.index('定价:') + 1]
 
 #### 第五步
 先创建数据库和数据表
-
 ```sql
 CREATE TABLE `allbooks` (
   `title` char(255) NOT NULL,
@@ -206,9 +182,7 @@ CREATE TABLE `allbooks` (
   `ISBN` char(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
-
 然后用executemany方法便捷地将数据存入。
-
 ```py3
 connection = pymysql.connect(host='你的主机',user='你的账号',password='你的密码',charset='utf8')
 with connection.cursor() as cursor:
@@ -221,9 +195,8 @@ title, scor, author, price, time, publish, person, yizhe, tag, brief, ISBN)VALUE
 connection.commit()
 ```
 #### 第六步
-
 到此，我们已经找到了全部的方法，就剩写出完整程序了
-还要注意的一点就是**要设置随机访问间隔，以防封IP**。
+还要注意的一点就是要设置随机访问间隔，以防封IP。
 代码如下，也在github更新，欢迎star，[我的github链接][2]。
 ```py3
 # -*- coding: utf-8 -*-
@@ -359,15 +332,19 @@ with connection.cursor() as cursor:
 if connection.open:
     connection.close()
 ```
+#### 结果展示
+![这里写图片描述](http://img.blog.csdn.net/20170813174218240?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+![这里写图片描述](http://img.blog.csdn.net/20170813174229921?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+![这里写图片描述](http://img.blog.csdn.net/20170813174309971?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvd2VpeGluXzM3NjU2OTM5/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 
 
 *文章原创，要转载请联系作者*
 
 ------
-[reference][1]
+参考博客: <http://www.jianshu.com/p/6c060433facf?appinstall=0>
 
-[1]: http://www.jianshu.com/p/6c060433facf?appinstall=0
+
 [2]: https://github.com/thronewang/Scraping
