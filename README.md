@@ -7,9 +7,11 @@
 -------------------------------------
 ### 更新日志
 
-2017 August 12th 第一版的豆瓣爬虫完成，但是被封了IP，只好过几天在试试。
+-------------------------------------
+#### 2017 August 12th 第一版的豆瓣爬虫完成，但是被封了IP，只好过几天在试试。
 
-2017 August 13th 第二版豆瓣爬虫完成，总结：
+--------------------------------------
+#### 2017 August 13th 第二版豆瓣爬虫完成，总结：
 
 趁着暑假的空闲，把在上个学期学到的Python数据采集的皮毛用来试试手，写了一个爬取豆瓣图书的爬虫，总结如下：
 下面是我要做的事：
@@ -348,3 +350,66 @@ if connection.open:
 
 
 [2]: https://github.com/thronewang/Scraping
+
+----------------------------------------
+#### 2017 August 15th 成功爬取温酒小故事
+总结如下：
+关于登陆的问题，可以参考我的另一篇博客： 
+http://blog.csdn.net/weixin_37656939/article/details/77142204
+
+在这里记录一下我在爬取温酒小故事的时候遇到的问题以及解决办法：
+
+1. CSS选择器无效，只好通过观察，用正则表达式直接从html里提取信息。
+2. 温酒小故事专栏会以随着拖动越来越多的方式呈现文章，于是通过开发者工具观察，发现是通过GET方法将limit和offer参数改变获得更多文章，与是模拟这一过程。
+
+##### 代码如下，同时在Github更新，我的Github链接：
+
+import requests
+from bs4 import BeautifulSoup
+import re
+from urllib.request import urlretrieve
+import time
+import random
+
+headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:54.0) Gecko/20100101 Firefox/54.0'}
+cookies = {}
+with open('C:/Users/lenovo/OneDrive/projects/Scraping/zhihucookies.txt') as file:
+    for pair in file.read().split(';'):
+        key,value = pair.split('=',1)
+        cookies[key] = value;
+
+
+limit = 20
+offset = 20
+while(True):
+    try:
+        url = 'https://zhuanlan.zhihu.com/api/columns/shuaiqiyyc/posts?limit=%d&offset=%d&topic=1307' % (limit, offset)
+        r = requests.get(url, headers=headers, cookies=cookies)
+        soup = BeautifulSoup(r.text.encode('utf-8'), 'html.parser')
+        r1=re.compile('"url": "/p/.*?"')
+        datas = str(soup)
+        prefix = 'https://zhuanlan.zhihu.com'
+        count = 0
+        for link in r1.findall(datas):
+            link = prefix + str(link)[8:-1]
+            print(link)
+            story = requests.get(link, headers=headers, cookies=cookies)
+            storySoup = BeautifulSoup(story.text.encode('utf-8'),'lxml')
+            reForTitle = re.compile('(?<=睡前故事：).+?(?= )')
+            try:
+                title = reForTitle.findall(storySoup.find('title').contents[0])[0]
+            except:
+                continue
+            img = str(storySoup.select('img'))
+            reForImg = re.compile('''(?<=src=').+?(?=')''')
+            imgUrl = reForImg.findall(img)[0][2:-2]
+            path = r'C:\Users\lenovo\OneDrive\projects\Scraping\stories\\'+title+'.png'
+            urlretrieve(imgUrl, path)
+            time.sleep(random.randint(0,9))
+    except:
+        break
+    finally:
+        count += 1
+        limit += 20
+        offset += 20
+print("Total: %d stories." % count)
