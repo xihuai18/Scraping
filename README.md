@@ -364,6 +364,7 @@ http://blog.csdn.net/weixin_37656939/article/details/77142204
 
 ##### 代码如下，同时在Github更新，我的Github链接：
 
+```py
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -413,3 +414,4 @@ while(True):
         limit += 20
         offset += 20
 print("Total: %d stories." % count)
+```
